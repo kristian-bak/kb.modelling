@@ -15,4 +15,9 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports: 
     xgboost,
-    data.table
+    data.table,
+    quantmod,
+    magrittr,
+    TTR,
+    rvest,
+    xml2
