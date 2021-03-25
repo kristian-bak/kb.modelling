@@ -6,9 +6,8 @@
 \usage{
 f_train(
   df_train,
-  df_test,
-  target,
-  var,
+  target_name,
+  var = NULL,
   nrounds = 32,
   max.depth = 4,
   eta = 1,
@@ -23,11 +22,9 @@ f_train(
 \arguments{
 \item{df_train}{train data. Should be data.table object}
 
-\item{df_test}{test data. Should be data.table object}
+\item{target_name}{target variable. Should be a string with a variable present in train data.}
 
-\item{target}{target variable. Should be a string with a variable present in train data.}
-
-\item{var}{variables used to train the model. Should be a character vector}
+\item{var}{variables used to train the model. Should be a character vector. Default value is NULL, indicating that all variables available from f_indicators will be used.}
 
 \item{nrounds}{max number of iterations. Default is 32}
 

@@ -32,20 +32,32 @@ f_change <- function(x, digits = 5) {
 }
 
 #' This function loads one stock from Yahoo.
+#' @description Get stock data from Yahoo by inputting ticker name.
 #' @param ticker ticker code from Yahoo. Use f_load to multiple stocks.
 #' @param from_date loads data from the date untill today. Date format is yyyy-mm-dd.
-#'
+#' @param offline logical. If TRUE, data will be loaded from data folder
 #' @return A data.table
 #' @export
 #' @import data.table
 #' @import quantmod
 
-f_load_one <- function(ticker, from_date = "2014-01-01") {
+f_load_one <- function(ticker, from_date = "2014-01-01", offline = FALSE) {
 
   Change <- Close <- Ticker <- NULL
 
-  data <- f_try_catch(quantmod::getSymbols(ticker, auto.assign = FALSE,
-                                           from = from_date, src = 'yahoo'))
+  if (offline) {
+    str_ticker <- gsub("\\.", "_", ticker)
+    file_name <- paste0(str_ticker, ".RDS")
+    full_file_name <- system.file("data/stocks", file_name, package = "kb.modelling")
+    data <- f_try_catch(readRDS(full_file_name))
+    if (!is.null(data$value)) {
+      return(data$value)
+    }
+  } else {
+    data <- f_try_catch(quantmod::getSymbols(ticker, auto.assign = FALSE,
+                                             from = from_date, src = 'yahoo'))
+  }
+
   str_stock <- f_get_stock(ticker = ticker)
 
   if (is.null(data$value)) {
@@ -79,6 +91,9 @@ f_load_one <- function(ticker, from_date = "2014-01-01") {
   data.table::setcolorder(data, neworder = c("Company", "Ticker", "Date", "Open", "Low", "High",
                                              "Close", "Adjusted", "Change", "Volume"))
 
+  flag_change_tomorrow <- NULL
+  data <- f_data_prep(data)
+
   return(data)
 
 }
@@ -86,16 +101,35 @@ f_load_one <- function(ticker, from_date = "2014-01-01") {
 #' This function loads data from Yahoo.
 #' @param ticker ticker code from Yahoo. Provide a vector of ticker codes to get multiple stocks.
 #' @param from_date loads data from the date untill today. Date format is yyyy-mm-dd.
-#'
+#' @param offline logical. If TRUE data will be loaded from data folder
 #' @return A data.table
 #' @export
 
-f_load <- function(ticker, from_date = "2014-01-01") {
+f_load <- function(ticker, from_date = "2014-01-01", offline = FALSE) {
 
-  df_list <- lapply(X = ticker, FUN = f_load_one, from_date = from_date)
+  df_list <- lapply(X = ticker, FUN = f_load_one, from_date = from_date, offline = offline)
 
   df_out <- do.call("rbind", df_list)
 
   return(df_out)
 
+}
+
+#' Loading data from Federal Reserve bank (FRED)
+#' @description f_load_fred takes character value and loads data from Federal Reserve bank (FRED)
+#' @param symbol symbol to load
+#' @importFrom quantmod getSymbols
+#'
+#' @return A data.table
+#' @export
+
+f_load_fred <- function(symbol) {
+  df <- quantmod::getSymbols(Symbols = symbol, src = "FRED")
+  df <- data.frame(mget(df))
+  df$Date <- rownames(df)
+  dt <- data.table::data.table(df)
+  dt$tmp <- f_change(dt[[symbol]])
+  dt[, (symbol) := NULL]
+  setnames(dt, old = "tmp", new = symbol)
+  return(dt)
 }

@@ -63,7 +63,7 @@ f_get_symbol <- function(stock = "NOVO", index = NULL, output = "vector") {
   }
 
   # change symbols to df_symbols
-  data("df_symbols", package = "kb.yahoo", envir = environment())
+  data("df_symbols", package = "kb.modelling", envir = environment())
   stock <- tolower(stock)
 
   if (!is.null(index)) {
@@ -96,7 +96,7 @@ f_get_stock <- function(ticker, index = NULL) {
   df_symbols <- NULL
 
   # change symbols to df_symbols
-  data("df_symbols", package = "kb.yahoo", envir = environment())
+  data("df_symbols", package = "kb.modelling", envir = environment())
 
   if (!is.null(index)) {
     if (!any(c("GDAXI", "OMX", "OMXC25", "OMXCXC20GI") %in% index)) {

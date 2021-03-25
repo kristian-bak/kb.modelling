@@ -20,4 +20,10 @@ Imports:
     magrittr,
     TTR,
     rvest,
-    xml2
+    xml2,
+    Ckmeans.1d.dp
+Depends:
+    R (>= 2.10)
+Suggests: 
+    testthat (>= 2.0.0)
+Config/testthat/edition: 2

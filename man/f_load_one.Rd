@@ -4,16 +4,18 @@
 \alias{f_load_one}
 \title{This function loads one stock from Yahoo.}
 \usage{
-f_load_one(ticker, from_date = "2014-01-01")
+f_load_one(ticker, from_date = "2014-01-01", offline = FALSE)
 }
 \arguments{
 \item{ticker}{ticker code from Yahoo. Use f_load to multiple stocks.}
 
 \item{from_date}{loads data from the date untill today. Date format is yyyy-mm-dd.}
+
+\item{offline}{logical. If TRUE, data will be loaded from data folder}
 }
 \value{
 A data.table
 }
 \description{
-This function loads one stock from Yahoo.
+Get stock data from Yahoo by inputting ticker name.
 }

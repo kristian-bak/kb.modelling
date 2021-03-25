@@ -4,14 +4,12 @@
 \alias{f_predict}
 \title{Predicting from xgboost models}
 \usage{
-f_predict(model, data, var)
+f_predict(model, data)
 }
 \arguments{
-\item{model}{xgboost model obtained from f_train}
+\item{model}{xgboost object obtained from f_train}
 
 \item{data}{data to calculate predictions on. Should be a data.table object}
-
-\item{var}{variables. Should be a characer vector}
 }
 \value{
 a numeric vector with predictions from the model

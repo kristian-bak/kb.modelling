@@ -1,8 +1,7 @@
 #' Training xgboost models
 #' @param df_train train data. Should be data.table object
-#' @param df_test test data. Should be data.table object
-#' @param target target variable. Should be a string with a variable present in train data.
-#' @param var variables used to train the model. Should be a character vector
+#' @param target_name target variable. Should be a string with a variable present in train data.
+#' @param var variables used to train the model. Should be a character vector. Default value is NULL, indicating that all variables available from f_indicators will be used.
 #' @param nrounds max number of iterations. Default is 32
 #' @param max.depth Max depth of the trees, i.e. the number of splits made.
 #' @param eta step size of each boosting step. Large eta may lead to unstable results. Default is 1.
@@ -15,18 +14,28 @@
 #' @export
 #' @return xgboost object
 
-f_train <- function(df_train, df_test,
-                    target, var,
+f_train <- function(df_train,
+                    target_name,
+                    var = NULL,
                     nrounds = 32,
                     max.depth = 4,
-                    eta = 1, min_child_weight = 50,
+                    eta = 1,
+                    min_child_weight = 50,
                     early_stopping_rounds = 25,
-                    subsample = 0.9, colsample_bytree = 0.9, gamma = 1, ...) {
+                    subsample = 0.9,
+                    colsample_bytree = 0.9,
+                    gamma = 1, ...) {
+
+  if (is.null(var)) {
+    var <- names(df_train)[!names(df_train) %in% c("Company", "Ticker", "Date", "Low", "High",
+                                                   "Close", "Adjusted", "Change",
+                                                   "change_tomorrow", "flag_change_tomorrow",
+                                                   "open_tomorrow")]
+  }
 
   mat_train <- as.matrix(df_train[, var, with = FALSE])
-  mat_test <- as.matrix(df_test[, var, with = FALSE])
   m <- xgboost::xgboost(data = mat_train,
-               label = df_train[[target]],
+               label = df_train[[target_name]],
                nrounds = nrounds,
                max.depth = max.depth,
                eta = eta,
@@ -38,19 +47,20 @@ f_train <- function(df_train, df_test,
                eval_metric = "auc",
                min_child_weight = min_child_weight,
                verbose = 0, ...)
+
   return(m)
 
 }
 
 #' Predicting from xgboost models
-#' @param model xgboost model obtained from f_train
+#' @param model xgboost object obtained from f_train
 #' @param data data to calculate predictions on. Should be a data.table object
-#' @param var variables. Should be a characer vector
 #' @export
 #' @importFrom stats predict
 #' @return a numeric vector with predictions from the model
 
-f_predict <- function(model, data, var) {
+f_predict <- function(model, data) {
+  var <- model$feature_names
   mat_data <- as.matrix(data[, var, with = FALSE])
   predict(model, newdata = mat_data)
 }

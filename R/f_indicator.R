@@ -62,7 +62,7 @@ f_ma_slope <- function(data, n = 10) {
 
   data$MA_slope <- rep(NA, nrow(data))
 
-  for (i in 1:l) {
+  for (i in i:l) {
     time_period <- start_day[i]:end_day[i]
     loopdata <- data[time_period, ]
 
@@ -106,7 +106,7 @@ f_indicator <- function(data, n = 10, m = 5) {
   data$momentum <- TTR::momentum(x = data$Close, n = 10)
 
   ## MACD Level (12, 26)
-  MACD_res <- data.frame(MACD(data$Close,Fast = 12, nSlow = 26))
+  MACD_res <- data.frame(TTR::MACD(data$Close,Fast = 12, nSlow = 26))
   data$MACD <- MACD_res$macd
 
   ## Stochastic RSI Fast (3, 3, 14, 14)
@@ -174,7 +174,7 @@ f_indicator <- function(data, n = 10, m = 5) {
   data$Signal <- MACD_res$signal
 
   ## MACD Signal difference
-  data$Diff <- data$MACD - data$Signal
+  data$MACD_Signal_Diff <- data$MACD - data$Signal
 
   ## MA
   data$MA <- TTR::SMA(data$Close, n = m)
@@ -186,6 +186,19 @@ f_indicator <- function(data, n = 10, m = 5) {
   data$MA50_slope <- f_ma_slope(data, n = 50)
   data$MA100_slope <- f_ma_slope(data, n = 100)
   data$MA200_slope <- f_ma_slope(data, n = 200)
+
+  ## Bollinger bands:
+
+  bb <- TTR::BBands(HLC = data[, c("High", "Low", "Close")])
+
+  data$lower_bb <- bb[, "dn"]
+  data$upper_bb <- bb[, "up"]
+  data$ma_bb <- bb[, "mavg"]
+  data$pct_bb <- bb[, "pctB"]
+
+  data[, pct_close_lower_bb := (Close - lower_bb) / Close]
+  data[, pct_upper_bb_close := (upper_bb - Close) / Close]
+  data[, bb_dif := upper_bb - lower_bb]
 
   return(data)
 
