@@ -4,12 +4,14 @@
 \alias{f_load}
 \title{This function loads data from Yahoo.}
 \usage{
-f_load(ticker, from_date = "2014-01-01", offline = FALSE)
+f_load(ticker, from_date = "2014-01-01", indicators = TRUE, offline = FALSE)
 }
 \arguments{
 \item{ticker}{ticker code from Yahoo. Provide a vector of ticker codes to get multiple stocks.}
 
 \item{from_date}{loads data from the date untill today. Date format is yyyy-mm-dd.}
+
+\item{indicators}{logical. If TRUE, technical indicators will be calculated.}
 
 \item{offline}{logical. If TRUE data will be loaded from data folder}
 }

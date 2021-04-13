@@ -4,10 +4,12 @@
 \alias{f_change}
 \title{This function is used to calculate price change in \%}
 \usage{
-f_change(x, digits = 5)
+f_change(x, from_start = FALSE, digits = 5)
 }
 \arguments{
 \item{x}{stock price}
+
+\item{from_start}{logical. If TRUE, change will be calculated since day 1}
 
 \item{digits}{number of digits used when rounding the price change}
 }

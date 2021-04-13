@@ -9,14 +9,14 @@
 #' @param shap_plot logical. If TRUE, shap plot will be calculated. Default is FALSE
 #' @param top_n top n variables to show in importance plot.
 #' @param offline logical. If TRUE, data will be loaded from data folder
-#' @param mode plot mode. Should be "candlesticks" or "lines". Default is "candlesticks".
+#' @param c cutoff for accuracy. Should be between 0 and 1. Default is 0.5
 #' @importFrom xgboost xgb.ggplot.importance
 #' @export
 #'
 f_report <- function(ticker, target_name = "target_day1", from_date = "2016-01-01",
                      var_names = NULL, buy_cut = 0.6, sell_cut = 0.4,
                      importance_plot = FALSE, shap_plot = FALSE, top_n = 7,
-                     offline = FALSE, mode = "candlesticks") {
+                     offline = FALSE, c = 0.5) {
 
   start_time <- Sys.time()
 
@@ -74,9 +74,15 @@ f_report <- function(ticker, target_name = "target_day1", from_date = "2016-01-0
   out_auc <- Hmisc::somers2(x = test_out_data[, p], y = test_out_data[[target_name]])[1]
   auc_list <- list("train_auc" = train_auc, "test_auc" = test_auc, "out_auc" = out_auc)
 
+  train_acc <- f_accuracy(x = train_data[, p], y = train_data[[target_name]], c = c)
+  test_acc <- f_accuracy(x = test_in_data[, p], y = test_in_data[[target_name]], c = c)
+  out_acc <- f_accuracy(x = test_out_data[, p], y = test_out_data[[target_name]], c = c)
+
+  acc_list <- list("train_acc" = train_acc, "test_acc" = test_acc, "out_acc" = out_acc)
+
   dt_transactions <- f_trade(test_out_data, buy_cut = buy_cut, sell_cut = sell_cut)
 
-  p <- f_plot_trade(test_out_data, dt_transactions, mode = mode)
+  p <- f_plot_trade(test_out_data, dt_transactions)
 
   f_cor <- function(data, target_name, x) {
     subdata <- na.omit(data[, c(target_name, x), with = FALSE])
@@ -101,6 +107,7 @@ f_report <- function(ticker, target_name = "target_day1", from_date = "2016-01-0
     "importance_plot" = importance_plot,
     "shap_plot" = shap_plot,
     "auc" = auc_list,
+    "acc" = acc_list,
     "trade_plot" = p,
     "cor" = df_cor,
     "comp_time" = comp_time))

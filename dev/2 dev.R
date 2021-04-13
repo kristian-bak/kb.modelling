@@ -5,6 +5,13 @@ devtools::document()
 ## Load function:
 devtools::load_all()
 
+## Install
+devtools::install(upgrade = FALSE)
+
+## Build
+
+devtools::build()
+
 ## Test all functions:
 devtools::test()
 

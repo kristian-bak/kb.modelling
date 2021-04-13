@@ -4,10 +4,12 @@
 \alias{f_slope}
 \title{This function calculates the slope of a moving average}
 \usage{
-f_slope(data)
+f_slope(data, n)
 }
 \arguments{
 \item{data}{data.table. data should be a obj an outcome from f_indicators to ensure MA is present in data.}
+
+\item{n}{Moving average based on n days}
 }
 \value{
 The slope of the moving average

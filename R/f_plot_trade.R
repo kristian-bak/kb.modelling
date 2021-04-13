@@ -1,10 +1,9 @@
 #' Plotting the trades
 #' @param test_data data.table with test data.
 #' @param dt_transactions data.table with transactions. This should be outcome from f_trade.
-#' @param mode plot mode. Should be "candlesticks" or "lines". Default is candlesticks
 #' @export
 
-f_plot_trade <- function(test_data, dt_transactions, mode = "candlesticks") {
+f_plot_trade <- function(test_data, dt_transactions) {
 
   my_return <- dt_transactions$stats$total_yield
   hodl_buy <- dt_transactions$transactions$buy_value[1]
@@ -25,16 +24,8 @@ f_plot_trade <- function(test_data, dt_transactions, mode = "candlesticks") {
             showarrow = FALSE)
 
   test_data[, Time := as.Date(Date)]
-  if (mode == "lines") {
-    p <- plotly::plot_ly(data = test_data, x = ~Time, y = ~Close, type = "scatter",
-                         mode = "lines") %>%
-      plotly::add_trace(x = ~Time, y = ~MA10_slope, mode = "lines+markers", color = "blue",
-                        yaxis = "y2", name = "MA slope")
-  } else {
-    p <- plotly::plot_ly(data = test_data, x = ~Time, type = "candlestick",
-                         open = ~Open, close = ~Close, low = ~Low, high = ~High)
-  }
-  p %>%
+  plotly::plot_ly(data = test_data, x = ~Time, type = "candlestick",
+          open = ~Open, close = ~Close, low = ~Low, high = ~High) %>%
     plotly::add_annotations(x = dt_transactions$transactions$buy_date,
                     y = dt_transactions$transactions$buy_value,
                     arrowcolor = 'black',
@@ -58,8 +49,7 @@ f_plot_trade <- function(test_data, dt_transactions, mode = "candlesticks") {
                     ax = dt_transactions$transactions$sell_date,
                     ay = dt_transactions$transactions$sell_value * 0.9) %>%
     plotly::layout(title = test_data[1, Ticker],
-                   yaxis2 = list(overlaying = "y", side = "right"),
-                   xaxis = list(rangeslider = list(visible = FALSE)),
-                   annotations = a)
+           xaxis = list(rangeslider = list(visible = FALSE)),
+           annotations = a)
 
 }

@@ -4,14 +4,12 @@
 \alias{f_plot_trade}
 \title{Plotting the trades}
 \usage{
-f_plot_trade(test_data, dt_transactions, mode = "candlesticks")
+f_plot_trade(test_data, dt_transactions)
 }
 \arguments{
 \item{test_data}{data.table with test data.}
 
 \item{dt_transactions}{data.table with transactions. This should be outcome from f_trade.}
-
-\item{mode}{plot mode. Should be "candlesticks" or "lines". Default is candlesticks}
 }
 \description{
 Plotting the trades

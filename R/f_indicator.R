@@ -19,16 +19,18 @@ f_lag <- function(x, n = 1) {
 
 #' This function calculates the slope of a moving average
 #' @param data data.table. data should be a obj an outcome from f_indicators to ensure MA is present in data.
+#' @param n Moving average based on n days
 #' @return The slope of the moving average
 #' @import data.table
 #' @importFrom stats coef lm na.omit
 
-f_slope <- function(data) {
+f_slope <- function(data, n) {
 
   id <- NULL
 
   data[, id := 1:.N]
-  subdata <- data[, c("MA", "id")]
+  ma_var <- paste0("MA", n)
+  subdata <- data[, c(ma_var, "id")]
   subdata <- na.omit(subdata)
   if (nrow(subdata) < 5) {
     return(NA)
@@ -47,26 +49,14 @@ f_ma_slope <- function(data, n = 10) {
 
   m <- nrow(data)
 
-  start_day <- seq(from = 1, to = m, by = n)
-  end_day <- seq(from = n, to = m, by = n)
-
-  k <- min(length(start_day), length(end_day))
-
-  start_day <- start_day[1:k]
-  end_day <- end_day[1:k]
-  h <- floor(n / 2)
-  id <- which(end_day - start_day > h)
-  start_day <- start_day[id]
-  end_day <- end_day[id]
-  l <- length(id)
-
   data$MA_slope <- rep(NA, nrow(data))
 
-  for (i in i:l) {
-    time_period <- start_day[i]:end_day[i]
-    loopdata <- data[time_period, ]
+  for (i in (n + n):m) {
+    loopdata <- data[(i - n):i, ]
 
-    data$MA_slope[time_period] <- f_slope(data = loopdata)
+    data$MA_slope[i] <- f_slope(data = loopdata, n = n)
+    cat("\r", i, "of", m)
+    flush.console()
 
   }
 
@@ -175,9 +165,6 @@ f_indicator <- function(data, n = 10, m = 5) {
 
   ## MACD Signal difference
   data$MACD_Signal_Diff <- data$MACD - data$Signal
-
-  ## MA
-  data$MA <- TTR::SMA(data$Close, n = m)
 
   ## MA slopes
   data$MA5_slope <- f_ma_slope(data, n = 5)

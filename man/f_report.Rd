@@ -15,7 +15,7 @@ f_report(
   shap_plot = FALSE,
   top_n = 7,
   offline = FALSE,
-  mode = "candlesticks"
+  c = 0.5
 )
 }
 \arguments{
@@ -37,7 +37,7 @@ f_report(
 
 \item{offline}{logical. If TRUE, data will be loaded from data folder}
 
-\item{mode}{plot mode. Should be "candlesticks" or "lines". Default is "candlesticks".}
+\item{c}{cutoff for accuracy. Should be between 0 and 1. Default is 0.5}
 
 \item{from}{date when loading data}
 }
